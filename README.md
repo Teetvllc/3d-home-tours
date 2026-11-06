@@ -10,6 +10,18 @@ your clients open from a link. No server, no database, no build step.
 - **Branded footer**: you ("Presented by") and the listing agent ("Listed by"), with NMLS/license number, contact links, headshots, accent color and disclaimer.
 - **Shareable layouts**: a client can arrange furniture and copy a link that reopens their exact layout.
 
+## Your live site
+
+Hosted free on GitHub Pages from the `Teetvllc/3d-home-tours` repository:
+
+- Builder: https://teetvllc.github.io/3d-home-tours/builder.html
+- Sample tour: https://teetvllc.github.io/3d-home-tours/view.html?l=sample
+
+**Adding a listing:** on your computer, make a folder named `<link-name>` and put the builder's `listing.json` in it.
+On github.com/Teetvllc/3d-home-tours open the `listings` folder, click **Add file → Upload files**,
+drag that whole folder in, and click **Commit changes**.
+The link `https://teetvllc.github.io/3d-home-tours/view.html?l=<link-name>` works about a minute later.
+
 ## Pages
 
 | Page | What it's for |
