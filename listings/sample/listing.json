@@ -1,0 +1,691 @@
+{
+  "version": 1,
+  "slug": "sample",
+  "details": {
+    "address": "1428 Sample Lane",
+    "city": "Anytown, NC",
+    "price": "$425,000",
+    "beds": 3,
+    "baths": 2.5,
+    "sqft": 1842,
+    "description": "Sample listing — replace with your own."
+  },
+  "plan": {
+    "src": "floorplan.svg",
+    "scale": 12,
+    "offsetX": -3,
+    "offsetY": -3,
+    "calibrated": true
+  },
+  "rooms": [
+    {
+      "id": "living",
+      "name": "Living Room",
+      "floor": "wood",
+      "x": 0,
+      "y": 0,
+      "w": 20,
+      "d": 16,
+      "doors": [
+        {
+          "wall": "w",
+          "offset": 6,
+          "width": 3,
+          "type": "door"
+        },
+        {
+          "wall": "e",
+          "offset": 2,
+          "width": 10,
+          "type": "opening"
+        }
+      ]
+    },
+    {
+      "id": "kitchen",
+      "name": "Kitchen",
+      "floor": "stone",
+      "x": 20,
+      "y": 0,
+      "w": 14,
+      "d": 12,
+      "doors": [
+        {
+          "wall": "s",
+          "offset": 0,
+          "width": 14,
+          "type": "opening"
+        }
+      ]
+    },
+    {
+      "id": "dining",
+      "name": "Dining",
+      "floor": "wood",
+      "x": 20,
+      "y": 12,
+      "w": 14,
+      "d": 10,
+      "doors": [
+        {
+          "wall": "w",
+          "offset": 5,
+          "width": 4,
+          "type": "opening"
+        },
+        {
+          "wall": "s",
+          "offset": 4,
+          "width": 6,
+          "type": "opening"
+        }
+      ]
+    },
+    {
+      "id": "flex",
+      "name": "Flex Space",
+      "floor": "wood",
+      "x": 8,
+      "y": 16,
+      "w": 12,
+      "d": 6,
+      "doors": [
+        {
+          "wall": "n",
+          "offset": 1,
+          "width": 10,
+          "type": "opening"
+        },
+        {
+          "wall": "s",
+          "offset": 2,
+          "width": 6,
+          "type": "opening"
+        }
+      ]
+    },
+    {
+      "id": "laundry",
+      "name": "Laundry",
+      "floor": "tile",
+      "x": 0,
+      "y": 16,
+      "w": 8,
+      "d": 6,
+      "doors": [
+        {
+          "wall": "s",
+          "offset": 2.5,
+          "width": 2.5,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "hall",
+      "name": "Hallway",
+      "floor": "wood",
+      "x": 0,
+      "y": 22,
+      "w": 50,
+      "d": 4,
+      "doors": [
+        {
+          "wall": "e",
+          "offset": 0.5,
+          "width": 3,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "primary",
+      "name": "Primary Bedroom",
+      "floor": "carpet",
+      "x": 34,
+      "y": 0,
+      "w": 16,
+      "d": 14,
+      "doors": [
+        {
+          "wall": "s",
+          "offset": 0.25,
+          "width": 2.67,
+          "type": "door"
+        },
+        {
+          "wall": "s",
+          "offset": 4,
+          "width": 2.5,
+          "type": "door"
+        },
+        {
+          "wall": "s",
+          "offset": 11,
+          "width": 2.5,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "phall",
+      "name": "Primary Hall",
+      "floor": "wood",
+      "x": 34,
+      "y": 14,
+      "w": 3,
+      "d": 8,
+      "doors": [
+        {
+          "wall": "s",
+          "offset": 0.17,
+          "width": 2.67,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "pbath",
+      "name": "Primary Bath",
+      "floor": "tile",
+      "x": 37,
+      "y": 14,
+      "w": 7,
+      "d": 8,
+      "doors": []
+    },
+    {
+      "id": "closet",
+      "name": "Walk-in Closet",
+      "floor": "carpet",
+      "x": 44,
+      "y": 14,
+      "w": 6,
+      "d": 8,
+      "doors": []
+    },
+    {
+      "id": "bed2",
+      "name": "Bedroom 2",
+      "floor": "carpet",
+      "x": 0,
+      "y": 26,
+      "w": 12,
+      "d": 12,
+      "doors": [
+        {
+          "wall": "n",
+          "offset": 8,
+          "width": 2.67,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "bath2",
+      "name": "Bath 2",
+      "floor": "tile",
+      "x": 12,
+      "y": 26,
+      "w": 8,
+      "d": 10,
+      "doors": [
+        {
+          "wall": "n",
+          "offset": 2,
+          "width": 2.5,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "bed3",
+      "name": "Bedroom 3",
+      "floor": "carpet",
+      "x": 20,
+      "y": 26,
+      "w": 12,
+      "d": 12,
+      "doors": [
+        {
+          "wall": "n",
+          "offset": 1,
+          "width": 2.67,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "office",
+      "name": "Office",
+      "floor": "light-wood",
+      "x": 32,
+      "y": 26,
+      "w": 11,
+      "d": 12,
+      "doors": [
+        {
+          "wall": "n",
+          "offset": 1,
+          "width": 2.67,
+          "type": "door"
+        }
+      ]
+    },
+    {
+      "id": "half",
+      "name": "Half Bath",
+      "floor": "tile",
+      "x": 43,
+      "y": 26,
+      "w": 7,
+      "d": 6,
+      "doors": [
+        {
+          "wall": "n",
+          "offset": 2,
+          "width": 2.5,
+          "type": "door"
+        }
+      ]
+    }
+  ],
+  "photos": [
+    {
+      "id": "p1",
+      "src": "photos/living.svg",
+      "roomId": "living",
+      "caption": "Living room"
+    },
+    {
+      "id": "p2",
+      "src": "photos/kitchen.svg",
+      "roomId": "kitchen",
+      "caption": "Kitchen"
+    },
+    {
+      "id": "p3",
+      "src": "photos/primary.svg",
+      "roomId": "primary",
+      "caption": "Primary bedroom"
+    },
+    {
+      "id": "p4",
+      "src": "photos/bath.svg",
+      "roomId": "pbath",
+      "caption": "Primary bath"
+    }
+  ],
+  "furniture": [
+    {
+      "id": "f1",
+      "key": "tv-stand",
+      "name": "TV + stand",
+      "kind": "tv",
+      "w": 5.8333,
+      "d": 1.5,
+      "h": 1.8333,
+      "x": 10,
+      "y": 0.98,
+      "rot": 0
+    },
+    {
+      "id": "f2",
+      "key": "rug-8x10",
+      "name": "Rug 8×10",
+      "kind": "rug",
+      "w": 8,
+      "d": 10,
+      "h": 0.0417,
+      "x": 10,
+      "y": 8,
+      "rot": 90
+    },
+    {
+      "id": "f3",
+      "key": "coffee",
+      "name": "Coffee table",
+      "kind": "coffee",
+      "w": 4,
+      "d": 2,
+      "h": 1.5,
+      "x": 10,
+      "y": 8.6,
+      "rot": 0
+    },
+    {
+      "id": "f4",
+      "key": "sofa-3",
+      "name": "Sofa (3-seat)",
+      "kind": "sofa",
+      "w": 7,
+      "d": 3.1667,
+      "h": 2.8333,
+      "x": 10,
+      "y": 12.2,
+      "rot": 180
+    },
+    {
+      "id": "f5",
+      "key": "armchair",
+      "name": "Armchair",
+      "kind": "chair",
+      "w": 2.8333,
+      "d": 3,
+      "h": 2.8333,
+      "x": 16.6,
+      "y": 8,
+      "rot": 90
+    },
+    {
+      "id": "f6",
+      "key": "plant",
+      "name": "Floor plant",
+      "kind": "plant",
+      "w": 1.6667,
+      "d": 1.6667,
+      "h": 4.5,
+      "x": 1.3,
+      "y": 14.6,
+      "rot": 0
+    },
+    {
+      "id": "f7",
+      "key": "counter",
+      "name": "Counter run 9'",
+      "kind": "counter",
+      "w": 9,
+      "d": 2.0833,
+      "h": 3,
+      "x": 26,
+      "y": 1.27,
+      "rot": 0
+    },
+    {
+      "id": "f8",
+      "key": "fridge",
+      "name": "Refrigerator",
+      "kind": "fridge",
+      "w": 3,
+      "d": 2.5,
+      "h": 5.8333,
+      "x": 32.25,
+      "y": 1.48,
+      "rot": 0
+    },
+    {
+      "id": "f9",
+      "key": "island",
+      "name": "Kitchen island",
+      "kind": "counter",
+      "w": 6,
+      "d": 3,
+      "h": 3,
+      "x": 27,
+      "y": 7,
+      "rot": 0
+    },
+    {
+      "id": "f10",
+      "key": "dining-6",
+      "name": "Dining table (6)",
+      "kind": "dining",
+      "w": 6,
+      "d": 3.3333,
+      "h": 2.5,
+      "x": 27,
+      "y": 17,
+      "rot": 0
+    },
+    {
+      "id": "f11",
+      "key": "washer-dryer",
+      "name": "Washer + dryer",
+      "kind": "laundry",
+      "w": 4.6667,
+      "d": 2.5,
+      "h": 3.1667,
+      "x": 4,
+      "y": 17.48,
+      "rot": 0
+    },
+    {
+      "id": "f12",
+      "key": "armchair",
+      "name": "Reading chair",
+      "kind": "chair",
+      "w": 2.8333,
+      "d": 3,
+      "h": 2.8333,
+      "x": 17.5,
+      "y": 19,
+      "rot": 90
+    },
+    {
+      "id": "f13",
+      "key": "bookshelf",
+      "name": "Bookshelf",
+      "kind": "shelf",
+      "w": 3,
+      "d": 1.1667,
+      "h": 6,
+      "x": 10,
+      "y": 21.2,
+      "rot": 180
+    },
+    {
+      "id": "f14",
+      "key": "bed-king",
+      "name": "King bed",
+      "kind": "bed",
+      "w": 6.6667,
+      "d": 7.1667,
+      "h": 4,
+      "x": 42,
+      "y": 3.82,
+      "rot": 0
+    },
+    {
+      "id": "f15",
+      "key": "nightstand",
+      "name": "Nightstand",
+      "kind": "storage",
+      "w": 2,
+      "d": 1.5,
+      "h": 2.1667,
+      "x": 37.5,
+      "y": 0.98,
+      "rot": 0
+    },
+    {
+      "id": "f16",
+      "key": "nightstand",
+      "name": "Nightstand",
+      "kind": "storage",
+      "w": 2,
+      "d": 1.5,
+      "h": 2.1667,
+      "x": 46.5,
+      "y": 0.98,
+      "rot": 0
+    },
+    {
+      "id": "f17",
+      "key": "dresser",
+      "name": "Dresser",
+      "kind": "storage",
+      "w": 5,
+      "d": 1.6667,
+      "h": 2.8333,
+      "x": 48.9,
+      "y": 9,
+      "rot": 90
+    },
+    {
+      "id": "f18",
+      "key": "vanity",
+      "name": "Vanity 48\"",
+      "kind": "vanity",
+      "w": 4,
+      "d": 1.8333,
+      "h": 2.8333,
+      "x": 42.87,
+      "y": 17,
+      "rot": 90
+    },
+    {
+      "id": "f19",
+      "key": "tub",
+      "name": "Bathtub",
+      "kind": "tub",
+      "w": 5,
+      "d": 2.5,
+      "h": 1.6667,
+      "x": 39.7,
+      "y": 20.52,
+      "rot": 180
+    },
+    {
+      "id": "f20",
+      "key": "toilet",
+      "name": "Toilet",
+      "kind": "toilet",
+      "w": 1.6667,
+      "d": 2.3333,
+      "h": 2.5,
+      "x": 38.4,
+      "y": 16.6,
+      "rot": 270
+    },
+    {
+      "id": "f21",
+      "key": "bed-queen",
+      "name": "Queen bed",
+      "kind": "bed",
+      "w": 5.3333,
+      "d": 7.1667,
+      "h": 4,
+      "x": 3.81,
+      "y": 32,
+      "rot": 270
+    },
+    {
+      "id": "f22",
+      "key": "dresser",
+      "name": "Dresser",
+      "kind": "storage",
+      "w": 5,
+      "d": 1.6667,
+      "h": 2.8333,
+      "x": 10.94,
+      "y": 33,
+      "rot": 90
+    },
+    {
+      "id": "f23",
+      "key": "tub",
+      "name": "Bathtub",
+      "kind": "tub",
+      "w": 5,
+      "d": 2.5,
+      "h": 1.6667,
+      "x": 16,
+      "y": 34.52,
+      "rot": 180
+    },
+    {
+      "id": "f24",
+      "key": "vanity",
+      "name": "Vanity 48\"",
+      "kind": "vanity",
+      "w": 4,
+      "d": 1.8333,
+      "h": 2.8333,
+      "x": 18.85,
+      "y": 30,
+      "rot": 90
+    },
+    {
+      "id": "f25",
+      "key": "toilet",
+      "name": "Toilet",
+      "kind": "toilet",
+      "w": 1.6667,
+      "d": 2.3333,
+      "h": 2.5,
+      "x": 13.4,
+      "y": 30.5,
+      "rot": 270
+    },
+    {
+      "id": "f26",
+      "key": "bed-full",
+      "name": "Full bed",
+      "kind": "bed",
+      "w": 4.75,
+      "d": 6.6667,
+      "h": 3.6667,
+      "x": 26,
+      "y": 34.44,
+      "rot": 180
+    },
+    {
+      "id": "f27",
+      "key": "desk",
+      "name": "Desk",
+      "kind": "desk",
+      "w": 5,
+      "d": 2.5,
+      "h": 2.5,
+      "x": 41.52,
+      "y": 32,
+      "rot": 90
+    },
+    {
+      "id": "f28",
+      "key": "bookshelf",
+      "name": "Bookshelf",
+      "kind": "shelf",
+      "w": 3,
+      "d": 1.1667,
+      "h": 6,
+      "x": 32.81,
+      "y": 33,
+      "rot": 270
+    },
+    {
+      "id": "f29",
+      "key": "toilet",
+      "name": "Toilet",
+      "kind": "toilet",
+      "w": 1.6667,
+      "d": 2.3333,
+      "h": 2.5,
+      "x": 45,
+      "y": 30.6,
+      "rot": 180
+    },
+    {
+      "id": "f30",
+      "key": "vanity-24",
+      "name": "Vanity 24\"",
+      "kind": "vanity",
+      "w": 2,
+      "d": 1.6667,
+      "h": 2.8333,
+      "x": 48.85,
+      "y": 30.2,
+      "rot": 90
+    }
+  ],
+  "branding": {
+    "agent": {
+      "name": "Listing Agent Name",
+      "title": "Listing Agent",
+      "brokerage": "Sample Realty",
+      "phone": "(555) 555-0199",
+      "email": "agent@example.com"
+    },
+    "disclaimer": ""
+  }
+}

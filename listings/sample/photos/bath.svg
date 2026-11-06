@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef1f2"/><stop offset="1" stop-color="#ffffff"/></linearGradient>
+<linearGradient id="f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d6cf"/><stop offset="1" stop-color="#5a4632"/></linearGradient>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9cc8e8"/><stop offset="1" stop-color="#e6f2fa"/></linearGradient></defs>
+<rect width="1200" height="560" fill="url(#w)"/><polygon points="0,560 1200,560 1200,800 0,800" fill="url(#f)"/>
+<rect x="760" y="120" width="300" height="300" fill="url(#sky)" stroke="#fff" stroke-width="14"/><line x1="910" y1="120" x2="910" y2="420" stroke="#fff" stroke-width="8"/>
+<rect x="120" y="420" width="420" height="150" fill="#fafafa" stroke="#ddd"/><rect x="620" y="400" width="300" height="170" fill="#50606e"/><rect x="610" y="390" width="320" height="18" fill="#e7e3dc"/><rect x="660" y="180" width="220" height="190" fill="#cfe2ea" stroke="#bbb"/>
+<rect x="30" y="30" width="360" height="56" rx="10" fill="rgba(0,0,0,.55)"/><text x="50" y="68" font-size="26" fill="#fff">Primary bath · sample photo</text></svg>

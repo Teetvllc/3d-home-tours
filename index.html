@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Home Tours</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="home">
+  <div class="home-wrap">
+    <h1>3D Home Tours</h1>
+    <p class="lede">Turn a listing's floor plan and photos into a 3D walkthrough your clients can open from a link. They can walk the home, place furniture, and check whether their bed or couch will fit.</p>
+    <div class="cards">
+      <a class="card" href="builder.html"><h3>Build a tour →</h3><p>Upload a floor plan, trace the rooms, add photos and your branding.</p></a>
+      <a class="card" href="view.html?l=sample"><h3>See the sample →</h3><p>A 3-bed sample home showing what clients will see.</p></a>
+    </div>
+    <div class="steps">
+      <h3>Publishing a new listing</h3>
+      <ol>
+        <li>Open the <a href="builder.html">builder</a>, make the tour, and click <b>Download listing.json</b>.</li>
+        <li>Upload that file to this site at <code>listings/&lt;link-name&gt;/listing.json</code>.</li>
+        <li>Send clients <code>view.html?l=&lt;link-name&gt;</code>.</li>
+      </ol>
+    </div>
+    <div id="mine"></div>
+  </div>
+  <script>
+    // Optional: list tours from listings/index.json  →  [{ "slug": "123-main-st", "title": "123 Main St" }]
+    fetch('listings/index.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : []).then(list => {
+      if (!list.length) return;
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      document.getElementById('mine').innerHTML = '<h3>Tours</h3><div class="listing-links">' +
+        list.map(l => `<a class="card" href="view.html?l=${encodeURIComponent(l.slug)}"><h3>${esc(l.title || l.slug)}</h3><p>view.html?l=${esc(l.slug)}</p></a><p class="fine"><a href="builder.html?l=${encodeURIComponent(l.slug)}">Edit this tour in the builder</a></p>`).join('') + '</div>';
+    }).catch(() => {});
+  </script>
+</body>
+</html>

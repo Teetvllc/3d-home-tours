@@ -1,0 +1,10 @@
+# Used by Netlify and Cloudflare Pages (ignored by GitHub Pages).
+# Always re-check code and listings so updates show up right away.
+/js/*
+  Cache-Control: no-cache
+/css/*
+  Cache-Control: no-cache
+/listings/*
+  Cache-Control: no-cache
+/config/*
+  Cache-Control: no-cache

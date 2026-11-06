@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listing 3D Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body class="builder">
+  <header class="bhead">
+    <span class="brand">Listing 3D Builder</span>
+    <span class="status" id="status"></span>
+    <span class="sp"></span>
+    <button class="btn" id="bNew" type="button">New listing</button>
+    <label class="btn">Open listing.json<input type="file" id="bOpen" accept=".json,application/json" hidden></label>
+    <button class="btn" id="bSample" type="button">Load sample</button>
+    <button class="btn" id="bPreview" type="button">Preview as visitor ↗</button>
+    <button class="btn primary" id="bExport" type="button">Download listing.json</button>
+  </header>
+
+  <div class="bwrap">
+    <aside class="bside">
+      <details open>
+        <summary><span><span class="step">1</span>Listing details</span></summary>
+        <label class="fld">Street address<input data-path="details.address" placeholder="123 Main St"></label>
+        <label class="fld">City, State<input data-path="details.city" placeholder="Charlotte, NC"></label>
+        <div class="grid2">
+          <label class="fld">Price<input data-path="details.price" placeholder="$450,000"></label>
+          <label class="fld">Sq ft<input data-path="details.sqft" inputmode="numeric" placeholder="auto from rooms"></label>
+          <label class="fld">Beds<input data-path="details.beds" inputmode="decimal"></label>
+          <label class="fld">Baths<input data-path="details.baths" inputmode="decimal"></label>
+        </div>
+      </details>
+
+      <details open>
+        <summary><span><span class="step">2</span>Floor plan image</span></summary>
+        <label class="btn block">Upload floor plan (JPG/PNG)<input type="file" id="planFile" accept="image/*" hidden></label>
+        <div id="planInfo"></div>
+      </details>
+
+      <details open id="roomsSection">
+        <summary><span><span class="step">3</span>Rooms &amp; doors</span></summary>
+        <p class="muted" style="margin:4px 0">Use <b>Draw room</b> to trace each room over the plan, or add rooms by size below. Edges snap together so walls line up.</p>
+        <div class="grid3" style="align-items:end">
+          <label class="fld">Room name<input id="qaName" placeholder="Bedroom 2"></label>
+          <label class="fld">Width<input id="qaW" placeholder="12' 6&quot;"></label>
+          <label class="fld">Depth<input id="qaD" placeholder="11'"></label>
+        </div>
+        <button class="btn block" id="qaAdd" type="button" style="margin-top:0">+ Add room by size</button>
+        <div class="room-list" id="roomList"></div>
+        <div id="roomEdit"></div>
+      </details>
+
+      <details>
+        <summary><span><span class="step">4</span>Listing photos</span></summary>
+        <label class="btn block">Add photos<input type="file" id="photoFiles" accept="image/*" multiple hidden></label>
+        <p class="fine">Pick which room each photo belongs to — visitors see a camera button on that room in 3D.</p>
+        <div class="photo-grid" id="photoGrid"></div>
+      </details>
+
+      <details>
+        <summary><span><span class="step">5</span>Branding</span></summary>
+        <h4 class="list-h">You (presented by)</h4>
+        <div class="grid2">
+          <label class="fld">Name<input data-path="branding.presenter.name"></label>
+          <label class="fld">Title<input data-path="branding.presenter.title"></label>
+          <label class="fld">Company<input data-path="branding.presenter.company"></label>
+          <label class="fld">NMLS #<input data-path="branding.presenter.nmls"></label>
+          <label class="fld">Phone<input data-path="branding.presenter.phone"></label>
+          <label class="fld">Email<input data-path="branding.presenter.email"></label>
+        </div>
+        <label class="fld">Website<input data-path="branding.presenter.website" placeholder="https://"></label>
+        <label class="fld">Apply / pre-approval link<input data-path="branding.presenter.applyUrl" placeholder="https://…  (blank = opens a pre-written email to you)"></label>
+        <div class="grid2">
+          <label class="fld">Button text<input data-path="branding.presenter.ctaLabel" placeholder="Apply Now"></label>
+          <label class="fld">Licensed in<input data-path="branding.presenter.licenses" placeholder="NC, SC, FL"></label>
+        </div>
+        <label class="btn">Headshot (optional)<input type="file" id="presPhoto" accept="image/*" hidden></label>
+        <button class="btn" type="button" id="saveMine">Save as my default</button>
+        <h4 class="list-h">Listing agent</h4>
+        <div class="grid2">
+          <label class="fld">Name<input data-path="branding.agent.name"></label>
+          <label class="fld">Brokerage<input data-path="branding.agent.brokerage"></label>
+          <label class="fld">Phone<input data-path="branding.agent.phone"></label>
+          <label class="fld">Email<input data-path="branding.agent.email"></label>
+        </div>
+        <label class="fld">License # (optional)<input data-path="branding.agent.license"></label>
+        <label class="btn">Agent headshot (optional)<input type="file" id="agentPhoto" accept="image/*" hidden></label>
+        <h4 class="list-h">Look &amp; disclaimer</h4>
+        <label class="fld">Accent color<input type="color" data-path="branding.accent" style="height:38px;padding:3px"></label>
+        <label class="fld">Footer disclaimer<textarea data-path="branding.disclaimer" rows="3"></textarea></label>
+        <p class="fine">Have your compliance team review the footer disclaimer for your state.</p>
+      </details>
+
+      <details open>
+        <summary><span><span class="step">6</span>Publish</span></summary>
+        <label class="fld">Link name (letters, numbers, dashes)<input data-path="slug" id="slug" placeholder="123-main-st"></label>
+        <div id="publishInfo"></div>
+      </details>
+    </aside>
+
+    <main class="bmain">
+      <div class="tabs" role="tablist">
+        <button type="button" class="on" data-tab="plan" role="tab">2D plan</button>
+        <button type="button" data-tab="3d" role="tab">3D preview &amp; staging</button>
+      </div>
+      <section class="pane" id="planPane">
+        <div class="plan-tools">
+          <div class="seg" id="toolSeg">
+            <button type="button" data-tool="select" class="on">Select</button>
+            <button type="button" data-tool="room">Draw room</button>
+            <button type="button" data-tool="door">Add door</button>
+            <button type="button" data-tool="calibrate">Calibrate</button>
+          </div>
+          <button class="btn" type="button" id="fitView">Fit</button>
+        </div>
+        <canvas id="planCanvas" tabindex="0" aria-label="Floor plan editor"></canvas>
+        <div class="plan-help" id="planHelp"></div>
+      </section>
+      <section class="pane three-pane" id="threePane" hidden>
+        <div class="hv" id="hv">
+          <div class="preview-tools"><div class="seg" id="bMode"><button type="button" data-mode="orbit" class="on">Dollhouse</button><button type="button" data-mode="walk">Walk</button></div></div>
+        </div>
+        <aside class="stage-side">
+          <div class="seg" id="sideSeg"><button type="button" data-side="furn" class="on">Stage furniture</button><button type="button" data-side="fit">Fit checker</button></div>
+          <div id="furnBody"></div>
+          <div id="fitBody" hidden></div>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="js/builder-page.js"></script>
+</body>
+</html>

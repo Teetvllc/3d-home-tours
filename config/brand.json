@@ -1,0 +1,17 @@
+{
+  "presenter": {
+    "name": "David Anderson",
+    "title": "VP of Mortgage Lending",
+    "company": "Rate",
+    "nmls": "1462679",
+    "phone": "(336) 543-6131",
+    "email": "David.Anderson@rate.com",
+    "website": "",
+    "applyUrl": "https://apply.rate.com/?emp-id=40384&utm_source=grMktg&utm_medium=email&utm_term=&utm_content=text&utm_campaign=sig",
+    "ctaLabel": "Apply Now",
+    "licenses": "NC, SC, GA, FL, IL, TX",
+    "photo": "config/headshot.jpg"
+  },
+  "accent": "#d2232a",
+  "disclaimer": "Equal Housing Lender. © 2026 Guaranteed Rate, Inc. D/B/A Rate | NMLS ID 2611. FL - LO74179, GA - 1462679, IL - 031.0094338, NC - I-192422, SC - MLO-1462679, TX - Licensed. This is not a commitment to lend; all loans subject to credit approval. 3D tour is generated from the listing floor plan; dimensions are approximate — verify independently."
+}
