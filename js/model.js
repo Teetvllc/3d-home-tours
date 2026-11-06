@@ -305,13 +305,13 @@ export function checkFit(room, item, entryDoors = []) {
 
 // ---------- share-a-layout links ----------
 export function encodeLayout(furn) {
-  const arr = furn.map(f => [f.key || '', f.kind, f.name, +f.w.toFixed(3), +f.d.toFixed(3), +f.h.toFixed(3), +f.x.toFixed(2), +f.y.toFixed(2), f.rot || 0, f.shape || '']);
+  const arr = furn.map(f => [f.key || '', f.kind, f.name, +f.w.toFixed(3), +f.d.toFixed(3), +f.h.toFixed(3), +f.x.toFixed(2), +f.y.toFixed(2), f.rot || 0, f.shape || '', f.level ?? 1]);
   return btoa(unescape(encodeURIComponent(JSON.stringify(arr)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 export function decodeLayout(s) {
   try {
     const json = decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
-    return JSON.parse(json).map(([key, kind, name, w, d, h, x, y, rot, shape]) =>
-      ({ id: uid('f'), key, kind, name, w, d, h, x, y, rot, shape: shape || undefined }));
+    return JSON.parse(json).map(([key, kind, name, w, d, h, x, y, rot, shape, level]) =>
+      ({ id: uid('f'), key, kind, name, w, d, h, x, y, rot, shape: shape || undefined, ...(level != null && level !== 1 ? { level } : {}) }));
   } catch { return null; }
 }

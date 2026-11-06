@@ -1,5 +1,6 @@
 // Builder: make a listing.json from a floor plan image, room sizes, photos and branding.
 import { PlanEditor } from './plan-editor.js';
+import { parseListingText, generateLayout, autoStage, levelName } from './generate.js';
 import { HomeViewer } from './viewer3d.js';
 import { mountFitPanel, mountFurniturePanel, toast } from './panels.js';
 import { fetchListing, listingUrl, inlineAssets, fileToDataURL, idbGet, idbSet, fetchBrandDefaults, lsGet, lsSet } from './store.js';
@@ -51,7 +52,7 @@ async function setListing(x, msg) {
   L = normalize(x);
   document.documentElement.style.setProperty('--accent', L.branding.accent || '#1f6f5c');
   fillPaths(); renderPlanInfo(); renderRooms(); renderPhotos(); renderPublish();
-  await editor.setImage(L.plan?.src); editor.select(null); editor.fit();
+  { const lv = editor.levels(); editor.level = lv.includes(1) ? 1 : (lv[0] ?? 1); } renderFloors(); await editor.setImage(L.plan?.src); editor.select(null); editor.fit();
   if (!$('threePane').hidden) refresh3D();
   save(true); if (msg) toast(null, msg);
 }
@@ -86,6 +87,35 @@ editor.addEventListener('tool', e => {
 $('toolSeg').onclick = e => { const t = e.target.closest('[data-tool]')?.dataset.tool; if (t) editor.setTool(t); };
 $('fitView').onclick = () => editor.fit();
 editor.setTool('select');
+
+// ---------- floors ----------
+function renderFloors() {
+  const lv = editor.levels();
+  $('floorSeg').innerHTML = lv.map(n => `<button type="button" data-level="${n}" class="${n === editor.level ? 'on' : ''}">${levelName(n)}</button>`).join('') +
+    `<button type="button" data-level="add" title="Add another floor">+ Floor</button>`;
+}
+$('floorSeg').onclick = e => {
+  const v = e.target.closest('[data-level]')?.dataset.level; if (v == null) return;
+  if (v === 'add') { const lv = editor.levels(); editor.level = Math.max(...lv) + 1; toast(null, `Now drawing the ${levelName(editor.level).toLowerCase()}. Draw or add rooms for it.`); }
+  else editor.level = +v;
+  renderFloors(); editor.select(null); editor.fit(); renderRooms();
+};
+
+// ---------- quick start: generate from listing text ----------
+$('genBtn').onclick = () => {
+  const text = $('genText').value;
+  const { details, rooms } = parseListingText(text);
+  if (!rooms.length && !details.beds) { $('genOut').innerHTML = '<p class="bad-text">Couldn\'t find any room sizes or bed/bath counts. Paste lines like “Kitchen 12 x 13”.</p>'; return; }
+  if (L.rooms.length && !confirm('Replace the current rooms and furniture with a generated layout?')) return;
+  L.rooms = generateLayout(rooms, details);
+  L.furniture = autoStage(L.rooms);
+  L.approximate = true;
+  for (const k of ['beds', 'baths', 'sqft', 'price']) if (details[k] != null) L.details[k] = details[k];
+  fillPaths(); renderPublish();
+  const lv = editor.levels(); editor.level = lv.includes(1) ? 1 : lv[0]; renderFloors(); renderRooms(); editor.fit(); changed();
+  const est = L.rooms.filter(r => r.est).length;
+  $('genOut').innerHTML = `<div class="callout" style="margin-top:8px">Built ${L.rooms.length} rooms on ${lv.length} floor${lv.length > 1 ? 's' : ''} (${rooms.length} sized from the listing, ${est} estimated — marked ≈) and placed ${L.furniture.length} pieces of furniture. Drag rooms to match the real home if you know it, then check the 3D tab.</div>`;
+};
 editor.addEventListener('change', () => { renderRooms(); changed(); });
 editor.addEventListener('live', () => renderRoomEditor());
 editor.addEventListener('select', () => renderRooms());
@@ -121,15 +151,15 @@ $('qaAdd').onclick = () => {
   const name = $('qaName').value.trim() || `Room ${L.rooms.length + 1}`;
   const w = parseFt($('qaW').value), d = parseFt($('qaD').value);
   if (!(w > 0 && d > 0)) { toast(null, 'Enter width and depth, like 12\' 6" or 12.5'); return; }
-  const b = L.rooms.length ? bounds(L.rooms) : { x1: 0, z0: 0 };
-  const r = { id: uid('r'), name, floor: defaultFloorFor(name), x: L.rooms.length ? b.x1 : 0, y: L.rooms.length ? b.z0 : 0, w, d, doors: [] };
+  const here = editor.rooms(); const b = here.length ? bounds(here) : { x1: 0, z0: 0 };
+  const r = { id: uid('r'), name, floor: defaultFloorFor(name), x: here.length ? b.x1 : 0, y: here.length ? b.z0 : 0, w, d, doors: [], ...(editor.level !== 1 ? { level: editor.level } : {}) };
   L.rooms.push(r); $('qaName').value = $('qaW').value = $('qaD').value = '';
   editor.select(r.id); editor.fit(); renderRooms(); changed();
   toast(null, `Added ${name}. Drag it into place on the plan — it snaps to other rooms.`);
 };
 
 function renderRooms() {
-  $('roomList').innerHTML = L.rooms.map(r => `<button type="button" data-id="${r.id}" class="${r.id === editor.selId ? 'on' : ''}">
+  $('roomList').innerHTML = editor.rooms().map(r => `<button type="button" data-id="${r.id}" class="${r.id === editor.selId ? 'on' : ''}">
     <span>${esc(r.name)}</span><small>${fmtFt(r.w)} × ${fmtFt(r.d)} · ${(r.doors || []).length} door${(r.doors || []).length === 1 ? '' : 's'}</small></button>`).join('')
     || '<p class="muted">No rooms yet.</p>';
   renderRoomEditor();
@@ -148,7 +178,9 @@ function renderRoomEditor() {
   el.innerHTML = `<div class="room-edit">
     <div class="grid2">
       <label class="fld">Name<input data-rf="name" value="${esc(r.name)}"></label>
-      <label class="fld">Floor<select data-rf="floor">${Object.entries(FLOORS).map(([k, v]) => `<option value="${k}" ${k === r.floor ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="fld">Flooring<select data-rf="floor">${Object.entries(FLOORS).map(([k, v]) => `<option value="${k}" ${k === r.floor ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="fld">On which floor<select data-rf="level">${[0, 1, 2, 3].map(n => `<option value="${n}" ${n === (r.level ?? 1) ? 'selected' : ''}>${levelName(n)}</option>`).join('')}</select></label>
+      <div></div>
       <label class="fld">Width ↔<input data-rf="w" value="${fmtFt(r.w)}"></label>
       <label class="fld">Depth ↕<input data-rf="d" value="${fmtFt(r.d)}"></label>
       <label class="fld">Left edge at<input data-rf="x" value="${fmtFt(r.x)}"></label>
@@ -167,6 +199,7 @@ function renderRoomEditor() {
     const k = inp.dataset.rf;
     if (k === 'name') { const was = r.floor === defaultFloorFor(r.name); r.name = inp.value; if (was) r.floor = defaultFloorFor(r.name); }
     else if (k === 'floor') r.floor = inp.value;
+    else if (k === 'level') { const n = +inp.value; if (n === 1) delete r.level; else r.level = n; editor.level = n; renderFloors(); editor.select(r.id); editor.fit(); }
     else { const v = parseFt(inp.value); if (isFinite(v) && (v > 0 || k === 'x' || k === 'y')) r[k] = Math.round(v * 12) / 12; else inp.value = fmtFt(r[k]); }
     editor.draw(); renderRooms(); changed();
   });
@@ -282,7 +315,13 @@ function refresh3D() {
     viewer.addEventListener('mode', e => $('bMode').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.mode === e.detail)));
     $('bMode').onclick = e => { const m = e.target.closest('[data-mode]')?.dataset.mode; if (m) viewer.setMode(m); };
   }
+  viewer.level = editor.level;
   viewer.load(L); furnPanel.refreshRooms(); furnPanel.renderList(); fitPanel.refreshRooms();
+  const seg = $('bLevel');
+  seg.hidden = viewer.levels.length < 2;
+  const paint = () => { seg.innerHTML = viewer.levels.map(n => `<button type="button" data-level="${n}" class="${n === viewer.level ? 'on' : ''}">${levelName(n)}</button>`).join(''); };
+  paint();
+  seg.onclick = e => { const n = e.target.closest('[data-level]')?.dataset.level; if (n != null) { viewer.setLevel(+n); paint(); } };
 }
 document.querySelector('.tabs').onclick = e => {
   const t = e.target.closest('[data-tab]')?.dataset.tab; if (!t) return;

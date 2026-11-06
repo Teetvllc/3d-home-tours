@@ -40,7 +40,7 @@ export class HomeViewer extends EventTarget {
 
     this.root = new THREE.Group(); this.furnGroup = new THREE.Group(); s.add(this.root, this.furnGroup);
     this.meshes = new Map(); this.furniture = []; this.rooms = []; this.wallRects = []; this.zones = []; this.labelObjs = [];
-    this.mode = 'orbit'; this.showPlan = false; this.selectedId = null; this.currentRoomId = null;
+    this.mode = 'orbit'; this.showPlan = false; this.level = 1; this.levels = [1]; this.allRooms = []; this.selectedId = null; this.currentRoomId = null;
     this.walk = { yaw: 0, pitch: 0, x: 0, z: 0, keys: new Set(), input: { f: 0, s: 0, turn: 0 } };
     this.ray = new THREE.Raycaster(); this.floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
     this._bind();
@@ -54,7 +54,12 @@ export class HomeViewer extends EventTarget {
     this._clear(this.root);
     this.labelObjs.forEach(l => l.element.remove()); this.labelObjs = [];
     this.listing = listing;
-    const rooms = this.rooms = (listing.rooms || []).filter(r => r.w > 0 && r.d > 0);
+    // Multi-story homes: rooms carry `level`; one floor is shown at a time.
+    this.allRooms = (listing.rooms || []).filter(r => r.w > 0 && r.d > 0);
+    this.levels = [...new Set(this.allRooms.map(r => r.level ?? 1))].sort((a, b) => a - b);
+    this.mainLevel = this.levels.includes(1) ? 1 : (this.levels[0] ?? 1);
+    if (!this.levels.includes(this.level)) this.level = this.mainLevel;
+    const rooms = this.rooms = this.allRooms.filter(r => (r.level ?? 1) === this.level);
     const { segments, openings } = computeWalls(rooms);
     this.wallRects = wallRectsFrom(segments); this.zones = openingZones(openings);
     const b = this.bounds = bounds(rooms);
@@ -114,7 +119,7 @@ export class HomeViewer extends EventTarget {
   _label(rm) {
     const div = document.createElement('div'); div.className = 'hv-label' + (rm.w * rm.d < 60 ? ' small' : '');
     const photos = (this.listing.photos || []).filter(p => p.roomId === rm.id).length;
-    div.innerHTML = `<button class="hv-room" type="button">${esc(rm.name)}<span>${fmtFt(rm.w)} × ${fmtFt(rm.d)}</span></button>` +
+    div.innerHTML = `<button class="hv-room" type="button">${esc(rm.name)}<span>${rm.est ? '≈ ' : ''}${fmtFt(rm.w)} × ${fmtFt(rm.d)}</span></button>` +
       (photos ? `<button class="hv-photo" type="button" title="See photos">${CAMERA_ICON}${photos}</button>` : '');
     div.querySelector('.hv-room').onclick = () => { this.goToRoom(rm.id); this.dispatchEvent(new CustomEvent('roomclick', { detail: rm.id })); };
     div.querySelector('.hv-photo')?.addEventListener('click', () => this.dispatchEvent(new CustomEvent('photos', { detail: rm.id })));
@@ -134,9 +139,24 @@ export class HomeViewer extends EventTarget {
   }
 
   // ---------------- furniture ----------------
+  /** Rooms on the main (entry) floor — used for the front-door check. */
+  get mainRooms() { return this.allRooms.filter(r => (r.level ?? 1) === this.mainLevel); }
+
+  /** Switch which floor is shown. Furniture on other floors is kept. */
+  setLevel(n) {
+    if (n === this.level || !this.levels.includes(n)) return;
+    const furn = this.getFurniture(), walking = this.mode === 'walk';
+    this.level = n; this.currentRoomId = null;
+    this.load({ ...this.listing, furniture: furn });
+    if (walking) this.setMode('walk');
+    this.dispatchEvent(new CustomEvent('level', { detail: n }));
+  }
+
   setFurniture(list) {
     this._clear(this.furnGroup); this.meshes.clear();
-    this.furniture = list.map(f => ({ ...f }));
+    const lv = f => f.level ?? 1;
+    this.otherFurniture = list.filter(f => lv(f) !== this.level).map(f => ({ ...f }));
+    this.furniture = list.filter(f => lv(f) === this.level).map(f => ({ ...f }));
     for (const f of this.furniture) this._addMesh(f);
     this.selectedId = null; this._retint();
     this.dispatchEvent(new CustomEvent('select', { detail: null }));
@@ -149,7 +169,10 @@ export class HomeViewer extends EventTarget {
       tint(this.meshes.get(f.id), f._bad ? 0x8a0f0f : f.id === this.selectedId ? 0x173a63 : 0x000000);
     }
   }
-  getFurniture() { return this.furniture.map(({ _bad, ...f }) => ({ ...f })); }
+  getFurniture() {
+    const here = this.furniture.map(({ _bad, ...f }) => ({ ...f, ...(this.levels?.length > 1 ? { level: this.level } : {}) }));
+    return [...(this.otherFurniture || []), ...here];
+  }
   get(id) { return this.furniture.find(f => f.id === id); }
   roomOf(f) { return roomAt(this.rooms, f.x, f.y); }
 

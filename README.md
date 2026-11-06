@@ -30,6 +30,26 @@ The link `https://teetvllc.github.io/3d-home-tours/view.html?l=<link-name>` work
 | `view.html?l=<name>` | The link you send. |
 | `index.html` | Simple home page listing your tours (from `listings/index.json`). |
 
+## Fastest: a tour from just the address (approximate layout)
+
+When there's no floor plan, a tour can be built from the listing's public facts: beds, baths, price, and the
+room-size list that Zillow, Redfin and the MLS show (e.g. "Primary Bedroom 14 x 16, Upper").
+
+- **In the builder:** open **⚡ Quick start from the listing**, paste the room list, and click **Generate layout + furniture**.
+- **From the command line** (how Claude builds one when you send an address): write a small spec file, then run
+  `node tools/make-listing.mjs spec.json`. See the top of that file for the format. It writes
+  `listings/<slug>/listing.json` and adds the tour to `listings/index.json`.
+
+What you get:
+- Rooms at their **real listed sizes**, arranged around a hallway: living areas on one side, bedrooms on the other, the primary suite kept together, and one floor per level with a floor switcher.
+- Rooms the listing didn't size (baths, closets, laundry, halls, stairs) are added at typical sizes and **marked ≈**.
+- Typical furniture placed automatically (bed sizes picked to fit each room), clear of doorways.
+- An **"Approximate layout"** badge, because where rooms sit relative to each other is estimated. The fit checker's room math still uses the real sizes.
+- A **"Listing photos ↗"** link to the online listing. Listing photos belong to the listing brokerage, so they're linked, not copied.
+  Add photos in the builder only when the listing agent has given you permission.
+
+If you later get the real floor plan, upload it in the builder and drag the rooms into their true positions.
+
 ## Make a tour for a new listing (about 10 minutes)
 
 1. Open **builder.html** and click **New listing**.

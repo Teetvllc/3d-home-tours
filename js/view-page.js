@@ -3,6 +3,7 @@ import { HomeViewer } from './viewer3d.js';
 import { mountFitPanel, mountFurniturePanel, toast } from './panels.js';
 import { fetchListing, listingUrl, idbGet, fetchBrandDefaults } from './store.js';
 import { fmtFt, encodeLayout, decodeLayout } from './model.js';
+import { levelName } from './generate.js';
 import { renderFooter, applyAccent, applyLink } from './brand.js';
 
 const $ = id => document.getElementById(id);
@@ -37,7 +38,10 @@ function fail(err) {
   $('addr').textContent = title;
   const sqft = D.sqft || Math.round((L.rooms || []).reduce((a, r) => a + r.w * r.d, 0));
   $('meta').innerHTML = [D.price && `<b>${esc(D.price)}</b>`, D.beds && `${esc(D.beds)} bd`, D.baths && `${esc(D.baths)} ba`,
-    sqft && `${Number(sqft).toLocaleString()} sq ft`].filter(Boolean).map(s => `<span>${s}</span>`).join('');
+    sqft && `${Number(sqft).toLocaleString()} sq ft`,
+    L.approximate && `<span class="approx" tabindex="0" title="Room sizes come from the listing. Where rooms sit relative to each other is estimated, because no floor plan was available. Sizes marked ≈ are estimates.">Approximate layout ⓘ</span>`,
+  ].filter(Boolean).map(s => `<span>${s}</span>`).join('');
+  if (D.listingUrl && /^https?:\/\//i.test(D.listingUrl)) Object.assign($('btnListing'), { href: D.listingUrl, hidden: false });
   const B = applyAccent(L, brand);
   renderFooter($('brand'), B, D.address || '');
   const lead = applyLink(B.presenter, D.address || '');
@@ -56,8 +60,23 @@ function fail(err) {
 
   // ---- rooms ----
   const roomsNav = $('rooms');
-  roomsNav.innerHTML = `<button type="button" data-room="" class="on">Whole home</button>` + viewer.rooms.map(r =>
-    `<button type="button" data-room="${r.id}">${esc(r.name)}<small>${fmtFt(r.w)} × ${fmtFt(r.d)}</small></button>`).join('');
+  const renderRooms = () => {
+    roomsNav.innerHTML = `<button type="button" data-room="" class="on">Whole ${viewer.levels.length > 1 ? 'floor' : 'home'}</button>` + viewer.rooms.map(r =>
+      `<button type="button" data-room="${r.id}">${esc(r.name)}<small>${r.est ? '≈ ' : ''}${fmtFt(r.w)} × ${fmtFt(r.d)}</small></button>`).join('');
+  };
+  renderRooms();
+
+  // ---- floors (multi-story homes) ----
+  const levelSeg = $('levelSeg');
+  if (viewer.levels.length > 1) {
+    levelSeg.hidden = false;
+    levelSeg.innerHTML = viewer.levels.map(n => `<button type="button" data-level="${n}" class="${n === viewer.level ? 'on' : ''}" title="${levelName(n)}">${{ 0: 'Bsmt', 1: '1st', 2: '2nd', 3: '3rd' }[n] ?? n} fl</button>`).join('');
+    levelSeg.onclick = e => { const n = e.target.closest('[data-level]')?.dataset.level; if (n != null) viewer.setLevel(+n); };
+    viewer.addEventListener('level', e => {
+      levelSeg.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.level === e.detail));
+      renderRooms(); showHint(`Showing the ${levelName(e.detail).toLowerCase()}`);
+    });
+  }
   const markRoom = id => roomsNav.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.room === (id || '')));
   roomsNav.onclick = e => {
     const b = e.target.closest('button'); if (!b) return;

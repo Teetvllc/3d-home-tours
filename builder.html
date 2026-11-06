@@ -28,6 +28,15 @@
 
   <div class="bwrap">
     <aside class="bside">
+      <details open id="genSection">
+        <summary><span><span class="step">⚡</span>Quick start from the listing</span></summary>
+        <p class="muted" style="margin:4px 0">No floor plan? Paste the listing's room sizes (Zillow, Redfin or MLS “Rooms” section) plus beds/baths/price. We'll build an approximate layout and furnish it.</p>
+        <label class="fld">Listing text<textarea id="genText" rows="7" placeholder="$389,900 · 4 bd · 3 ba · 2,150 sqft&#10;Main Level&#10;Living Room 15 x 18&#10;Kitchen 12'6&quot; x 13'&#10;Upper Level&#10;Primary Bedroom 14 x 16&#10;Bedroom 2 11 x 12"></textarea></label>
+        <label class="fld">Link to the online listing (shown as “Listing photos ↗”)<input data-path="details.listingUrl" placeholder="https://www.zillow.com/homedetails/…"></label>
+        <button class="btn primary block" id="genBtn" type="button">Generate layout + furniture</button>
+        <div id="genOut"></div>
+      </details>
+
       <details open>
         <summary><span><span class="step">1</span>Listing details</span></summary>
         <label class="fld">Street address<input data-path="details.address" placeholder="123 Main St"></label>
@@ -121,13 +130,14 @@
             <button type="button" data-tool="calibrate">Calibrate</button>
           </div>
           <button class="btn" type="button" id="fitView">Fit</button>
+          <div class="seg" id="floorSeg"></div>
         </div>
         <canvas id="planCanvas" tabindex="0" aria-label="Floor plan editor"></canvas>
         <div class="plan-help" id="planHelp"></div>
       </section>
       <section class="pane three-pane" id="threePane" hidden>
         <div class="hv" id="hv">
-          <div class="preview-tools"><div class="seg" id="bMode"><button type="button" data-mode="orbit" class="on">Dollhouse</button><button type="button" data-mode="walk">Walk</button></div></div>
+          <div class="preview-tools"><div class="seg" id="bMode"><button type="button" data-mode="orbit" class="on">Dollhouse</button><button type="button" data-mode="walk">Walk</button></div><div class="seg" id="bLevel" hidden></div></div>
         </div>
         <aside class="stage-side">
           <div class="seg" id="sideSeg"><button type="button" data-side="furn" class="on">Stage furniture</button><button type="button" data-side="fit">Fit checker</button></div>

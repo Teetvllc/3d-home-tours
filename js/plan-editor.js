@@ -8,7 +8,7 @@ export class PlanEditor extends EventTarget {
   constructor(canvas, getListing) {
     super();
     this.cv = canvas; this.g = canvas.getContext('2d'); this.getL = getListing;
-    this.tool = 'select'; this.zoom = 10; this.panX = -5; this.panY = -5; this.selId = null; this.img = null; this.act = null;
+    this.tool = 'select'; this.level = 1; this.zoom = 10; this.panX = -5; this.panY = -5; this.selId = null; this.img = null; this.act = null;
     canvas.addEventListener('pointerdown', e => this._down(e));
     canvas.addEventListener('pointermove', e => this._move(e));
     canvas.addEventListener('pointerup', e => this._up(e));
@@ -19,6 +19,10 @@ export class PlanEditor extends EventTarget {
   }
 
   get L() { return this.getL(); }
+  /** Rooms on the floor being edited. */
+  rooms() { return (this.L?.rooms || []).filter(r => (r.level ?? 1) === this.level); }
+  levels() { const s = [...new Set((this.L?.rooms || []).map(r => r.level ?? 1))]; if (!s.includes(this.level)) s.push(this.level); return s.sort((a, b) => a - b); }
+  setLevel(n) { this.level = n; this.select(null); this.dispatchEvent(new CustomEvent('level', { detail: n })); this.fit(); }
   setTool(t) { this.tool = t; this.cv.style.cursor = t === 'select' ? 'default' : 'crosshair'; this.dispatchEvent(new CustomEvent('tool', { detail: t })); this.draw(); }
   select(id) { this.selId = id; this.dispatchEvent(new CustomEvent('select', { detail: id })); this.draw(); }
   _changed() { this.dispatchEvent(new CustomEvent('change')); this.draw(); }
@@ -33,7 +37,7 @@ export class PlanEditor extends EventTarget {
   }
 
   fit() {
-    const rooms = this.L.rooms; const ir = this.imgRect();
+    const rooms = this.rooms(); const ir = this.imgRect();
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const r of rooms) { x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y); x1 = Math.max(x1, r.x + r.w); y1 = Math.max(y1, r.y + r.d); }
     if (ir) { x0 = Math.min(x0, ir.x); y0 = Math.min(y0, ir.y); x1 = Math.max(x1, ir.x + ir.w); y1 = Math.max(y1, ir.y + ir.h); }
@@ -51,7 +55,7 @@ export class PlanEditor extends EventTarget {
   _snapAxis(v, axis, excludeId) {
     const tol = 8 / this.zoom;
     let best = null;
-    for (const r of this.L.rooms) {
+    for (const r of this.rooms()) {
       if (r.id === excludeId) continue;
       for (const c of axis === 'x' ? [r.x, r.x + r.w] : [r.y, r.y + r.d]) if (Math.abs(c - v) < tol && (!best || Math.abs(c - v) < Math.abs(best - v))) best = c;
     }
@@ -59,7 +63,7 @@ export class PlanEditor extends EventTarget {
   }
   _snap(v, axis, id) { const s = this._snapAxis(v, axis, id); return s ?? Math.round(v * 4) / 4; }
 
-  _roomAt(p) { return [...this.L.rooms].sort((a, b) => a.w * a.d - b.w * b.d).find(r => p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.d); }
+  _roomAt(p) { return [...this.rooms()].sort((a, b) => a.w * a.d - b.w * b.d).find(r => p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.d); }
   _handleAt(p) {
     const r = this.L.rooms.find(q => q.id === this.selId); if (!r) return null;
     const tol = 8 / this.zoom;
@@ -72,7 +76,7 @@ export class PlanEditor extends EventTarget {
   }
   _nearestWall(p) {
     let best = null;
-    for (const r of this.L.rooms) for (const wall of ['n', 's', 'w', 'e']) {
+    for (const r of this.rooms()) for (const wall of ['n', 's', 'w', 'e']) {
       const h = wall === 'n' || wall === 's';
       const c = wall === 'n' ? r.y : wall === 's' ? r.y + r.d : wall === 'w' ? r.x : r.x + r.w;
       const a = h ? r.x : r.y, b = a + (h ? r.w : r.d), along = h ? p.x : p.y, perp = h ? p.y : p.x;
@@ -127,7 +131,7 @@ export class PlanEditor extends EventTarget {
       if (nx !== r.x || ny !== r.y) a.moved = true;
       // move furniture that sits in this room along with it
       const dx = nx - r.x, dy = ny - r.y;
-      for (const f of this.L.furniture || []) if (f.x > r.x && f.x < r.x + r.w && f.y > r.y && f.y < r.y + r.d) { f.x += dx; f.y += dy; }
+      for (const f of this.L.furniture || []) if ((f.level ?? 1) === this.level && f.x > r.x && f.x < r.x + r.w && f.y > r.y && f.y < r.y + r.d) { f.x += dx; f.y += dy; }
       r.x = nx; r.y = ny;
     } else if (a.type === 'resize') {
       const r = a.r, o = a.o, h = a.h;
@@ -145,7 +149,7 @@ export class PlanEditor extends EventTarget {
       const x = Math.min(a.x0, a.x1), y = Math.min(a.y0, a.y1), w = Math.abs(a.x1 - a.x0), d = Math.abs(a.y1 - a.y0);
       if (w >= 2 && d >= 2) {
         const name = `Room ${this.L.rooms.length + 1}`;
-        const r = { id: uid('r'), name, floor: defaultFloorFor(name), x, y, w, d, doors: [] };
+        const r = { id: uid('r'), name, floor: defaultFloorFor(name), x, y, w, d, doors: [], ...(this.level !== 1 ? { level: this.level } : {}) };
         this.L.rooms.push(r); this.setTool('select'); this.select(r.id); this._changed();
         this.dispatchEvent(new CustomEvent('created', { detail: r.id }));
       }
@@ -204,7 +208,7 @@ export class PlanEditor extends EventTarget {
     if (ir) { g.globalAlpha = L.plan.opacity ?? 0.8; g.drawImage(this.img, this.sx(ir.x), this.sy(ir.y), ir.w * z, ir.h * z); g.globalAlpha = 1; }
     const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#1f6f5c';
     // rooms
-    for (const r of L.rooms) {
+    for (const r of this.rooms()) {
       const sel = r.id === this.selId;
       g.fillStyle = sel ? hexA(accent, 0.22) : hexA(accent, 0.10);
       g.fillRect(this.sx(r.x), this.sy(r.y), r.w * z, r.d * z);
@@ -212,14 +216,14 @@ export class PlanEditor extends EventTarget {
       g.strokeRect(this.sx(r.x), this.sy(r.y), r.w * z, r.d * z);
     }
     // doors
-    for (const r of L.rooms) for (const d of r.doors || []) this._drawDoor(r, d, d.type === 'opening' ? '#3d8bd4' : '#e07b1a');
+    for (const r of this.rooms()) for (const d of r.doors || []) this._drawDoor(r, d, d.type === 'opening' ? '#3d8bd4' : '#e07b1a');
     if (this.tool === 'door' && this._hover) {
       const h = this._hover, width = Math.min(2.67, h.len);
       this._drawDoor(h.room, { wall: h.wall, offset: Math.max(0, Math.min(h.len - width, h.along - width / 2)), width }, 'rgba(224,123,26,.5)');
     }
     // labels
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    for (const r of L.rooms) {
+    for (const r of this.rooms()) {
       const cx = this.sx(r.x + r.w / 2), cy = this.sy(r.y + r.d / 2), fs = Math.max(9, Math.min(14, z * 0.9));
       if (r.w * z < 30 || r.d * z < 20) continue;
       g.font = `600 ${fs}px Inter, system-ui, sans-serif`;

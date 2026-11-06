@@ -26,7 +26,7 @@ export function mountFitPanel(el, { viewer, onPlaced }) {
       <label class="fld">Depth<input data-k="d" inputmode="decimal"><small>inches</small></label>
       <label class="fld">Height<input data-k="h" inputmode="decimal"><small>inches</small></label>
     </div>
-    <label class="fld">Which room?<select data-k="room"></select></label>
+    <label class="fld">Which room? <small>(rooms on the floor you're viewing)</small><select data-k="room"></select></label>
     <button class="btn primary block" data-act="check" type="button">Check fit</button>
     <div class="fit-result" data-k="result" aria-live="polite"></div>`;
   const $ = k => el.querySelector(`[data-k="${k}"]`);
@@ -37,6 +37,7 @@ export function mountFitPanel(el, { viewer, onPlaced }) {
   sel.onchange = () => { fillDims(); $('room').value = defaultRoomFor(viewer, sel.value) || $('room').value; $('result').innerHTML = ''; };
   const refreshRooms = () => { const cur = $('room').value; $('room').innerHTML = roomOptions(viewer.rooms, cur || defaultRoomFor(viewer, sel.value)); };
   refreshRooms();
+  viewer.addEventListener('level', () => { $('room').value = ''; refreshRooms(); $('result').innerHTML = ''; });
 
   const current = () => {
     const cat = catalogItem(sel.value);
@@ -49,7 +50,7 @@ export function mountFitPanel(el, { viewer, onPlaced }) {
     const item = current(), room = viewer.rooms.find(r => r.id === $('room').value), out = $('result');
     if (!(item.w > 0 && item.d > 0)) { out.innerHTML = '<p class="bad-text">Enter a width and depth in inches (e.g. 84).</p>'; return; }
     if (!room) { out.innerHTML = '<p class="bad-text">This listing has no rooms yet.</p>'; return; }
-    const r = checkFit(room, item, exteriorDoors(viewer.rooms)), b = r.best;
+    const r = checkFit(room, item, exteriorDoors(viewer.mainRooms || viewer.rooms)), b = r.best;
     const V = { great: ['ok', 'Fits comfortably'], door: ['warn', 'Fits the room — the doorway is the tricky part'], fits: ['warn', 'Fits — but it\'s snug'], no: ['bad', 'Won\'t fit in this room'] }[r.verdict];
     const roomW = fmtFt(room.w), roomD = fmtFt(room.d);
     const orient = b.rot === 0
@@ -100,6 +101,7 @@ export function mountFurniturePanel(el, { viewer, extraButtons = '' }) {
   const refreshRooms = () => { const cur = $('room').value; $('room').innerHTML = roomOptions(viewer.rooms, cur || viewer.currentRoomId || viewer.rooms[0]?.id); };
   refreshRooms();
   viewer.addEventListener('roomclick', e => { $('room').value = e.detail; });
+  viewer.addEventListener('level', () => { $('room').value = ''; refreshRooms(); renderList(); });
 
   el.querySelector('.catalog').addEventListener('click', e => {
     const key = e.target.closest('[data-add]')?.dataset.add; if (!key) return;
